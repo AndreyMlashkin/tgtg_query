@@ -1,4 +1,23 @@
 from tgtg import TgtgClient
+from datetime import datetime, timezone 
+import pytz
+from tzlocal import get_localzone
+
+tz = get_localzone()
+
+def make_unique(list_with_duplicates):
+    unique_list = []
+    for item in list_with_duplicates:
+        id = item["item"]["item_id"]
+        unique = True
+        for sub_item in unique_list:
+            if sub_item["item"]["item_id"] == id:
+                unique = False
+                break
+        if unique:
+            unique_list.append(item)
+    return unique_list
+
 
 email="beyoh24361@moenode.com"
 name="TestUser"
@@ -17,12 +36,23 @@ if not credentials:
     except Exception as e:
         pass
 
-items = client.get_items(
-    favorites_only=False,
-    latitude=47.07,
-    longitude=15.43,
-    radius=10,
-)
+coordinates_list = [
+(47.065677, 15.444379),
+(47.045050, 15.433340),
+(47.066350, 15.469640),
+]
+
+items = []
+for point in coordinates_list:
+    items += client.get_items(
+        favorites_only=False,
+        latitude=point[0],
+        longitude=point[1],
+        radius=2,
+    )
+
+items = make_unique(items)
+now = datetime.utcnow().astimezone()
 
 good_items = []
 for item in items:
@@ -38,7 +68,6 @@ for item in items:
            
                 if item['items_available'] == 0:
                     continue
-           
                 good_item={'item_id' : item_object['item_id'],
                 'rating' : rating,
                 'store_name' : store_object['store_name'],
@@ -58,5 +87,6 @@ def rating_compare(item):
 
 good_items.sort(key=rating_compare)
 
+print("UTC now is {}".format(datetime.utcnow()))
 for value in good_items:
     print(value)
