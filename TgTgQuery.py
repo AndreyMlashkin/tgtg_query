@@ -79,8 +79,7 @@ class TgTgQuery:
         'user_id': '88299346'
         }
 
-    def query(self):
-
+    def _get_good_items_list(self):
         client = TgtgClient(email=self.email, access_token=self.credentials["access_token"], refresh_token=self.credentials["refresh_token"], user_id=self.credentials["user_id"])
         #client.signup_by_email(email=email)
 
@@ -106,7 +105,6 @@ class TgTgQuery:
             )
 
         items = make_unique(items)
-        now = datetime.utcnow()
 
         good_items = []
         for item in items:
@@ -124,7 +122,11 @@ class TgTgQuery:
             return -item.rating
 
         good_items.sort(key=rating_compare)
-        
+        return good_items
+
+    def query(self):
+        good_items = self._get_good_items_list()
+        now = datetime.utcnow()
         result = "UTC now is {}\n\n".format(now)
         for value in good_items:
             result += value.to_string()
