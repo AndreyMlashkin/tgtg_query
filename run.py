@@ -52,7 +52,7 @@ for point in coordinates_list:
     )
 
 items = make_unique(items)
-now = datetime.utcnow().astimezone()
+now = datetime.utcnow()
 
 good_items = []
 for item in items:
@@ -68,10 +68,22 @@ for item in items:
            
                 if item['items_available'] == 0:
                     continue
+
+                time_stamp = item['purchase_end']
+                time_stamp_utc = datetime.fromisoformat(time_stamp.replace('Z', '+00:00'))
+                time_stamp_without_region = datetime.fromisoformat(time_stamp.replace('Z', ''))
+                time_left_seconds = (time_stamp_without_region - now).total_seconds()
+
+                time_left_minutes = time_left_seconds / 60
+                time_left_hours = time_left_minutes / 60
+                time_left_minutes = time_left_minutes % 60
+
+                time_left_str = "{}h:{}m".format(int(time_left_hours), int(time_left_minutes))
                 good_item={'item_id' : item_object['item_id'],
                 'rating' : rating,
                 'store_name' : store_object['store_name'],
                 'purchase_end' : item['purchase_end'],
+                'time_left' : time_left_str,
                 'items_available' : item['items_available'],
                 }
                 
@@ -87,6 +99,6 @@ def rating_compare(item):
 
 good_items.sort(key=rating_compare)
 
-print("UTC now is {}".format(datetime.utcnow()))
+print("UTC now is {}".format(now))
 for value in good_items:
     print(value)
