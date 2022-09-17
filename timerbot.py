@@ -44,7 +44,6 @@ logging.basicConfig(
 
 tgtg = TgTgQuery()
 
-
 # Define a few command handlers. These usually take the two arguments update and
 # context.
 # Best practice would be to replace context with an underscore,
@@ -60,7 +59,7 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
 
-    result = tgtg.query()
+    result = tgtg.query_new_items()
 
     await context.bot.send_message(job.chat_id, text=result)
 

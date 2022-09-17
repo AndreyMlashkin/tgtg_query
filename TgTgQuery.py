@@ -2,6 +2,12 @@ from tgtg import TgtgClient
 from datetime import datetime
 from tzlocal import get_localzone
 
+def print_ids(good_items_list):
+    result = ""
+    for item in good_items_list:
+        result += item.item_id + " "
+    print (result)
+
 def make_unique(list_with_duplicates):
     unique_list = []
     for item in list_with_duplicates:
@@ -14,6 +20,30 @@ def make_unique(list_with_duplicates):
         if unique:
             unique_list.append(item)
     return unique_list
+
+def subtract(old, new):
+    diff_list = []
+    for new_item in new:
+        unique = True
+        for old_item in old:
+            if old_item.item_id == new_item.item_id:
+                unique = False
+                break
+        if unique:
+            diff_list.append(new_item)
+    return diff_list
+
+def add(old, new):
+    new_list = old
+    for new_item in new:
+        unique = True
+        for old_item in old:
+            if old_item.item_id == new_item.item_id:
+                unique = False
+                break
+        if unique:
+            new_list.append(new_item)
+    return new_list
 
 
 class GoodItem:
@@ -66,7 +96,7 @@ class GoodItem:
 
 
     def to_string(self):
-        return "rating: {}\tstore_name: {}\tpurchase_end: {}\ttime_left: {}\titems_available: {}\n\n\n".format(self.rating, self.store_name, self.purchase_end, self.time_left, self.items_available)
+        return "rating: {}\tstore_name: {}\tpurchase_end: {}\ttime_left: {}\titems_available: {}\n\n\n".format(round(self.rating, 2), self.store_name, self.purchase_end, self.time_left, self.items_available)
 
 class TgTgQuery:
 
@@ -78,8 +108,10 @@ class TgTgQuery:
         'refresh_token': 'e30.eyJzdWIiOiI4ODI5OTM0NiIsImV4cCI6MTY5NDc3NTM4MSwidCI6IkFiZW9MYVI0UXc2R19ib21ScDI4eFE6MDowIn0.4xXD-QoCGzQf1fhStnkIDj1drGMOI2Mti9eTPSndOJo',
         'user_id': '88299346'
         }
+        
+        self.old_good_items = []
 
-    def _get_good_items_list(self):
+    def get_good_items_list(self):
         client = TgtgClient(email=self.email, access_token=self.credentials["access_token"], refresh_token=self.credentials["refresh_token"], user_id=self.credentials["user_id"])
         #client.signup_by_email(email=email)
 
@@ -123,9 +155,19 @@ class TgTgQuery:
 
         good_items.sort(key=rating_compare)
         return good_items
+        
+    def query_new_items(self):
+        new_good_items = self.get_good_items_list()
+        diff = subtract(self.old_good_items, new_good_items)
+        self.old_good_items = add(new_good_items, self.old_good_items)
+        now = datetime.utcnow()
+        result = ""
+        for value in diff:
+            result += value.to_string()
+        return result
 
     def query(self):
-        good_items = self._get_good_items_list()
+        good_items = self.get_good_items_list()
         now = datetime.utcnow()
         result = "UTC now is {}\n\n".format(now)
         for value in good_items:
