@@ -13,9 +13,8 @@ the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
-Basic Alarm Bot example, sends a message after a set time.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
+call /start and you will get the best Tgtg packages directly in chat
+Press Ctrl-C on the command line or send a signal to the process to stop the bot.
 """
 
 import logging
@@ -52,15 +51,24 @@ tgtg = TgTgQuery()
 # we decided to have it present as context.
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Sends explanation on how to use the bot."""
-    await update.message.reply_text("Hi! Use /set <seconds> to set a timer")
+    try:
+        chat_id = update.effective_message.chat_id
 
+        job_removed = remove_job_if_exists(str(chat_id), context)
+        context.job_queue.run_repeating(alarm, 10, chat_id=chat_id, name=str(chat_id))
+
+        text = "Requesting the best tg packages"
+        if job_removed:
+            text += " Old request was removed."
+        await update.effective_message.reply_text(text)
+
+    except (IndexError, ValueError):
+        await update.effective_message.reply_text("fatal error occured")
 
 async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
-
     result = tgtg.query_new_items()
-
     await context.bot.send_message(job.chat_id, text=result)
 
 
@@ -74,35 +82,12 @@ def remove_job_if_exists(name: str, context: ContextTypes.DEFAULT_TYPE) -> bool:
     return True
 
 
-async def set_timer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Add a job to the queue."""
-    chat_id = update.effective_message.chat_id
-    try:
-        # args[0] should contain the time for the timer in seconds
-        due = float(context.args[0])
-        if due < 0:
-            await update.effective_message.reply_text("Sorry we can not go back to future!")
-            return
-
-        job_removed = remove_job_if_exists(str(chat_id), context)
-        context.job_queue.run_repeating(alarm, due, chat_id=chat_id, name=str(chat_id), data=due)
-
-        text = "Timer successfully set!"
-        if job_removed:
-            text += " Old one was removed."
-        await update.effective_message.reply_text(text)
-
-    except (IndexError, ValueError):
-        await update.effective_message.reply_text("Usage: /set <seconds>")
-
-
-async def unset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Remove the job if the user changed their mind."""
     chat_id = update.message.chat_id
     job_removed = remove_job_if_exists(str(chat_id), context)
-    text = "Timer successfully cancelled!" if job_removed else "You have no active timer."
+    text = "Requesting the best tg packages successfully cancelled!" if job_removed else "You have no active requests."
     await update.message.reply_text(text)
-
 
 def main() -> None:
     """Run bot."""
@@ -111,8 +96,7 @@ def main() -> None:
 
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler(["start", "help"], start))
-    application.add_handler(CommandHandler("set", set_timer))
-    application.add_handler(CommandHandler("unset", unset))
+    application.add_handler(CommandHandler("stop", stop))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
