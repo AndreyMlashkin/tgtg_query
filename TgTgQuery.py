@@ -102,12 +102,11 @@ class TgTgQuery:
 
     def __init__(self):
         self.tz = get_localzone()
-        self.email="beyoh24361@moenode.com"
+        self.email=""
         self.name="TestUser"
-        self.credentials = {'access_token': 'e30.eyJzdWIiOiI4ODI5OTM0NiIsImV4cCI6MTY2MzQxMjE4MSwidCI6IkhGLUo4SHFCUnR5LWNqU3lNWnhzV1E6MDoxIn0.ETkJC5NVfJvdFH1yt5gnlcjxQgjEWqyi7MktRWGXi6Y',
-        'refresh_token': 'e30.eyJzdWIiOiI4ODI5OTM0NiIsImV4cCI6MTY5NDc3NTM4MSwidCI6IkFiZW9MYVI0UXc2R19ib21ScDI4eFE6MDowIn0.4xXD-QoCGzQf1fhStnkIDj1drGMOI2Mti9eTPSndOJo',
-        'user_id': '88299346'
-        }
+        
+        self.credentials = {'access_token': 'e30.eyJzdWIiOiI1MDIzODY4OCIsImV4cCI6MTY3MDU4OTUxMiwidCI6IjE2VGp3bUVQUjRlQzAwRkJCQ0F3b2c6MDoxIn0.W96ztW6FyHw3HhcH9rqruQZyqkR_h4ACS97vhDw9SWY', 'refresh_token': 'e30.eyJzdWIiOiI1MDIzODY4OCIsImV4cCI6MTcwMTk1MjcxMiwidCI6IlVocDBZbXZMVEo2T3JadTNMV2xRdEE6MDowIn0.r3blyUEXgK8MWXpaNL96pm38kaagUliD7PaIZp1Dm-c', 
+'user_id': '50238688'}
         
         self.old_good_items = []
 

@@ -55,7 +55,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         chat_id = update.effective_message.chat_id
 
         job_removed = remove_job_if_exists(str(chat_id), context)
-        context.job_queue.run_repeating(alarm, 10, chat_id=chat_id, name=str(chat_id))
+        context.job_queue.run_repeating(alarm, 120, chat_id=chat_id, name=str(chat_id))
 
         text = "Requesting the best tg packages"
         if job_removed:
@@ -69,8 +69,8 @@ async def alarm(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the alarm message."""
     job = context.job
     result = tgtg.query_new_items()
-    await context.bot.send_message(job.chat_id, text=result)
-
+    if result:
+        await context.bot.send_message(job.chat_id, text=result)
 
 def remove_job_if_exists(name: str, context: ContextTypes.DEFAULT_TYPE) -> bool:
     """Remove job with given name. Returns whether job was removed."""

@@ -1,6 +1,6 @@
 from tgtg import TgtgClient
 
-client = TgtgClient(email="malashkin.andrey@gmail.com")
+client = TgtgClient(email="sabadir758@edinel.com")
 print("clinet created")
 credentials = client.get_credentials()
 
